@@ -1,0 +1,42 @@
+name: CI
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/**'
+      - 'sample_module/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'pdm.lock'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/**'
+      - 'sample_module/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'pdm.lock'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup PDM
+      uses: pdm-project/setup-pdm@v4
+      with:
+        cache: true
+
+    - name: Install dependencies
+      run: pdm install
+
+    - name: Run tests
+      run: |
+        pdm run test
